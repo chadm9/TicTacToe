@@ -12,7 +12,9 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12 text-center">
-                <h1>Tic Tac Toe</h1>
+                <img id="main-img" src="min-max-toe.png">
+                <p id="head-text">A Tic-Tac-Toe engine based on the <a href="https://en.wikipedia.org/wiki/Minimax">
+                    minimax algorithm</a></p>
             </div>
         </div>
 
@@ -23,7 +25,7 @@
         </div>
 
         <div class="row">
-            <div id="board" class="col-sm-12">
+            <div id="board" class="col-sm-12 text-center">
                 <div class="board-row">
                     <button class="square" id="A1">A1</button>
                     <button class="square" id="B1">B1</button>
@@ -42,7 +44,7 @@
             </div>
         </div>
         <div class="row">
-            <button class="text-center" id="restart" onclick="restart();">restart</button>
+            <button id="restart-button" class="text-center" onclick="restart();">restart</button>
         </div>
 
 

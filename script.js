@@ -67,12 +67,7 @@ function markSquare(currentSquare){
     messageElement.innerHTML = squareResult;
 }
 
-function computerMove(){
-    // find a random square
-    // see if that square is empty
-    // if it is, send it to square
-    // if it's not, keep looking
-}
+
 
 function checkWin(currentPlayersSquares, whoJustWent){
     // Outter Loop (winning combos)
