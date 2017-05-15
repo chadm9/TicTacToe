@@ -9,20 +9,6 @@
 // 5. We need to check to see if someone won
 
 //Initialize whosTurn at player 1 / x
-
-
-
-var board = [[undefined, undefined, undefined],
-         [undefined, undefined, undefined],
-         [undefined, undefined, undefined]];
-
-var goard = [['x', 'o', 'o'],
-             ['o', 'x', 'x'],
-             ['x', 'o', 'o']];
-
-var player_token = 'x';
-var cpu_token = 'o';
-
 var whosTurn = 1;
 var player1Squares = [];
 var player2Squares = [];
@@ -40,70 +26,6 @@ var gameOverBool = false;
 var onePlayerGame = true;
 
 var squares = document.getElementsByClassName('square');
-
-function movesRemaining(board) {
-    for(let i = 0; i < 3; i++){
-        for(let j = 0; j < 3; j++){
-            if (board[i][j] === undefined){
-                return true;
-            }
-
-        }
-    }
-    return false;
-}
-
-
-function evaluateState(board, player_token, cpu_token){
-    for(let i = 0; i < 3; i++){
-        if (board[i][0] === board[i][1] && board[i][1] === board[i][2]){
-            if (board[i][0] === cpu_token){
-                return 10;
-            }
-
-            else if (board[i][0] === player_token){
-                return -10
-            }
-
-        }
-    }
-    for(let i = 0; i < 3; i++){
-        if (board[0][i] === board[1][i] && board[1][i] === board[2][i]){
-            if (board[0][i] === cpu_token){
-                return 10;
-            }
-
-            else if (board[0][i] === player_token){
-                return -10
-            }
-
-        }
-    }
-    if (board[2][0] === board[1][1] && board[1][1] === board[0][2]){
-        if (board[2][0] === cpu_token){
-            return 10
-        }
-        else if (board[2][0] === player_token){
-            return -10
-        }
-    }
-
-    if (board[0][0] === board[1][1] && board[1][1] === board[2][2]){
-        if (board[0][0] === cpu_token){
-            return 10
-        }
-        else if (board[0][0] === player_token){
-
-            return -10
-        }
-    }
-
-    return 0;
-}
-
-
-console.log(evaluateState(goard, player_token, cpu_token));
-
 for(let i = 0; i < squares.length; i++){
     // console.log(squares[i]);
     squares[i].addEventListener('click', function(event){
