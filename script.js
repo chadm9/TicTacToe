@@ -42,7 +42,7 @@ $(document).ready(function() {
 
             }
         }
-        gameOver = true;
+        gameOver = false;
         return false;
     }
 
@@ -245,10 +245,11 @@ $(document).ready(function() {
         if(!movesRemaining(board)){
             $('#message').html("Draw!");
         }
-        if(evaluateState(board, player_token, cpu_token) == 10){
+        else if(evaluateState(board, player_token, cpu_token) == 10){
             $('#message').html("CPU wins!");
             gameOver = true;
-        }else{
+        }
+        if(movesRemaining(board) && !gameOver){
             $('#message').html("Player's Turn");
             playerTurn = true;
         }
@@ -284,7 +285,7 @@ $(document).ready(function() {
 
     $('#restart-button').click(function(){
 
-        if(gameOver){
+        if(true){
 
             board = [[null, null, null], [null, null, null], [null, null, null]];
             $('.square').each(function(){
