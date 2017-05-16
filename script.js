@@ -259,7 +259,7 @@ $(document).ready(function() {
 
     $('.square').click(function(){
 
-        if(playerTurn  && this.id.length === 2  && movesRemaining(board)){
+        if(playerTurn  && this.innerHTML.length === 2  && movesRemaining(board)){
 
             selectedMove = mapToBoard(this.id);
             console.log(selectedMove);
