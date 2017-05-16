@@ -28,6 +28,10 @@ $(document).ready(function() {
     var playerTurn = true;
     var gameOver = false;
 
+    if(playerTurn){
+        $('#message').html("Player's Turn");
+    }
+
 
     function movesRemaining(board) {
         for (var i = 0; i < 3; i++) {
@@ -232,23 +236,44 @@ $(document).ready(function() {
     }
 
 
+    function cpuTurn() {
+        cpuMove = determineMove(board, player_token, cpu_token, maximizer);
+        board[cpuMove[0]][cpuMove[1]] = cpu_token;
+        $('#' + maptToHTML(cpuMove)).html(cpu_token);
 
+
+        if(!movesRemaining(board)){
+            $('#message').html("Draw!");
+        }
+        if(evaluateState(board, player_token, cpu_token) == 10){
+            $('#message').html("CPU wins!");
+            gameOver = true;
+        }else{
+            $('#message').html("Player's Turn");
+            playerTurn = true;
+        }
+
+    }
 
 
     $('.square').click(function(){
 
         if(playerTurn  && this.id.length === 2  && movesRemaining(board)){
+
             selectedMove = mapToBoard(this.id);
             console.log(selectedMove);
             $(this).html(player_token);
             board[selectedMove[0]][selectedMove[1]] = player_token;
             playerTurn = false;
+            if(!movesRemaining(board)){
+                $('#message').html("Draw!");
+            }
+
 
             if(movesRemaining(board)){
-                cpuMove = determineMove(board, player_token, cpu_token, maximizer);
-                board[cpuMove[0]][cpuMove[1]] = cpu_token;
-                $('#' + maptToHTML(cpuMove)).html(cpu_token);
-                playerTurn = true;
+                $('#message').html("CPU's Turn");
+                window.setTimeout(cpuTurn, 1250)
+
             }
 
 
@@ -269,15 +294,18 @@ $(document).ready(function() {
             if(player_token == 'X'){
                 player_token = 'O';
                 cpu_token = 'X'
-                cpuMove = determineMove(board, player_token, cpu_token, maximizer);
+                $('#message').html("CPU's Turn");
+                window.setTimeout(cpuTurn, 1250)
+/*                cpuMove = determineMove(board, player_token, cpu_token, maximizer);
                 board[cpuMove[0]][cpuMove[1]] = cpu_token;
                 $('#' + maptToHTML(cpuMove)).html(cpu_token);
-                playerTurn = true;
+                playerTurn = true;*/
             }
             else{
                 player_token = 'X';
                 cpu_token = 'O';
                 playerTurn = true;
+                $('#message').html("Player's Turn");
             }
             gameOver = false;
         }
