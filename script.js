@@ -11,202 +11,281 @@
 //Initialize whosTurn at player 1 / x
 
 
+$(document).ready(function() {
 
-var board = [[undefined, undefined, undefined],
-         [undefined, undefined, undefined],
-         [undefined, undefined, undefined]];
 
-var goard = [['x', 'o', 'o'],
-             ['o', 'x', 'x'],
-             ['x', 'o', 'o']];
+    var board = [[null, null, null], [null, null, null], [null, null, null]];
 
-var player_token = 'x';
-var cpu_token = 'o';
 
-var whosTurn = 1;
-var player1Squares = [];
-var player2Squares = [];
-var winningCombos = [
-    ['A1','B1','C1'], //Row1
-    ['A2','B2','C2'], //Row2
-    ['A3','B3','C3'], //Row3
-    ['A1','A2','A3'], //Column1
-    ['B1','B2','B3'], //Column2
-    ['C1','C2','C3'], //Column3
-    ['A1','B2','C3'], //Diag1
-    ['A3','B2','C1'] //Diag2
-]
-var gameOverBool = false;
-var onePlayerGame = true;
+    var goard = [[null, 'x', 'o'],
+        ['o', 'x', null],
+        ['x', 'o', 'o']];
 
-var squares = document.getElementsByClassName('square');
+    var player_token = 'X';
+    var cpu_token = 'O';
+    var maximizer = true;
 
-function movesRemaining(board) {
-    for(let i = 0; i < 3; i++){
-        for(let j = 0; j < 3; j++){
-            if (board[i][j] === undefined){
-                return true;
+    var playerTurn = true;
+    var gameOver = false;
+
+
+    function movesRemaining(board) {
+        for (var i = 0; i < 3; i++) {
+            for (var j = 0; j < 3; j++) {
+                if (board[i][j] === null) {
+                    return true;
+                }
+
             }
-
         }
+        gameOver = true;
+        return false;
     }
-    return false;
-}
 
 
-function evaluateState(board, player_token, cpu_token){
-    for(let i = 0; i < 3; i++){
-        if (board[i][0] === board[i][1] && board[i][1] === board[i][2]){
-            if (board[i][0] === cpu_token){
+    function evaluateState(board, player_token, cpu_token) {
+        for (var i = 0; i < 3; i++) {
+            if (board[i][0] === board[i][1] && board[i][1] === board[i][2]) {
+                if (board[i][0] === cpu_token) {
+                    return 10;
+                }
+
+                else if (board[i][0] === player_token) {
+                    return -10;
+                }
+
+            }
+        }
+        for (var i = 0; i < 3; i++) {
+            if (board[0][i] === board[1][i] && board[1][i] === board[2][i]) {
+                if (board[0][i] === cpu_token) {
+                    return 10;
+                }
+
+                else if (board[0][i] === player_token) {
+                    return -10;
+                }
+
+            }
+        }
+        if (board[2][0] === board[1][1] && board[1][1] === board[0][2]) {
+            if (board[2][0] === cpu_token) {
                 return 10;
             }
-
-            else if (board[i][0] === player_token){
-                return -10
+            else if (board[2][0] === player_token) {
+                return -10;
             }
-
         }
-    }
-    for(let i = 0; i < 3; i++){
-        if (board[0][i] === board[1][i] && board[1][i] === board[2][i]){
-            if (board[0][i] === cpu_token){
+
+        if (board[0][0] === board[1][1] && board[1][1] === board[2][2]) {
+            if (board[0][0] === cpu_token) {
                 return 10;
             }
+            else if (board[0][0] === player_token) {
 
-            else if (board[0][i] === player_token){
-                return -10
+                return -10;
+            }
+        }
+
+        return 0;
+    }
+
+
+    function miniMax(board, player_token, cpu_token, maximizer) {
+        var value = evaluateState(board, player_token, cpu_token);
+        var best_choice;
+        if (value === 10 || value === -10) {
+            return value;
+        }
+
+
+        if (!movesRemaining(board)) {
+            return 0;
+        }
+
+
+        if (maximizer) {
+            best_choice = -11;
+            for (var i = 0; i < 3; i++) {
+                for (var j = 0; j < 3; j++) {
+                    if (board[i][j] === null) {
+                        board[i][j] = cpu_token;
+                        best_choice = Math.max(miniMax(board, player_token, cpu_token, !maximizer), best_choice);
+                        board[i][j] = null;
+
+                    }
+
+                }
+
+            }
+            return best_choice;
+        }
+
+        else {
+            best_choice = 11;
+            for (var i = 0; i < 3; i++) {
+                for (var j = 0; j < 3; j++) {
+                    if (board[i][j] === null) {
+                        board[i][j] = player_token;
+                        best_choice = Math.min(miniMax(board, player_token, cpu_token, !maximizer), best_choice);
+                        board[i][j] = null;
+
+                    }
+
+                }
+
+            }
+            return best_choice;
+        }
+
+    }
+
+    function determineMove(board, player_token, cpu_token, maximizer) {
+        var best_move = [null, null];
+        var best_value = -11;
+
+        for (var i = 0; i < 3; i++) {
+            for (var j = 0; j < 3; j++) {
+                if (board[i][j] === null) {
+                    board[i][j] = cpu_token;
+                    move_value = miniMax(board, player_token, cpu_token, !maximizer);
+                    board[i][j] = null;
+                    if (best_value < move_value) {
+                        best_value = move_value;
+                        best_move[0] = i;
+                        best_move[1] = j;
+
+                    }
+
+                }
+
             }
 
         }
-    }
-    if (board[2][0] === board[1][1] && board[1][1] === board[0][2]){
-        if (board[2][0] === cpu_token){
-            return 10
-        }
-        else if (board[2][0] === player_token){
-            return -10
-        }
+
+
+        return best_move
     }
 
-    if (board[0][0] === board[1][1] && board[1][1] === board[2][2]){
-        if (board[0][0] === cpu_token){
-            return 10
+    function mapToBoard(id){
+        if(id == 'A1'){
+            return [0,0];
         }
-        else if (board[0][0] === player_token){
+        else if(id == 'B1'){
+            return [0,1];
+        }
+        else if(id == 'C1'){
+            return [0,2];
+        }
+        else if(id == 'A2'){
+            return [1,0];
+        }
+        else if(id == 'B2'){
+            return [1,1];
+        }
+        else if(id == 'C2'){
+            return [1,2];
+        }
+        else if(id == 'A3'){
+            return [2,0];
+        }
+        else if(id == 'B3'){
+            return [2,1];
+        }
+        else if(id == 'C3'){
+            return [2,2];
+        }
 
-            return -10
-        }
+
     }
 
-    return 0;
-}
-
-
-console.log(evaluateState(goard, player_token, cpu_token));
-
-for(let i = 0; i < squares.length; i++){
-    // console.log(squares[i]);
-    squares[i].addEventListener('click', function(event){
-        // console.log("User clicked on a square!")
-        if(!gameOverBool){
-            markSquare(this)
+    function maptToHTML(cpuMove) {
+        if(cpuMove[0] == 0 && cpuMove[1] == 0){
+            return 'A1'
         }
+        else if(cpuMove[0] == 0 && cpuMove[1] == 1){
+            return 'B1'
+        }
+        else if(cpuMove[0] == 0 && cpuMove[1] == 2){
+            return 'C1'
+        }
+        else if(cpuMove[0] == 1 && cpuMove[1] == 0){
+            return 'A2'
+        }
+        else if(cpuMove[0] == 1 && cpuMove[1] == 1){
+            return 'B2'
+        }
+        else if(cpuMove[0] == 1 && cpuMove[1] == 2){
+            return 'C2'
+        }
+        else if(cpuMove[0] == 2 && cpuMove[1] == 0){
+            return 'A3'
+        }
+        else if(cpuMove[0] == 2 && cpuMove[1] == 1){
+            return 'B3'
+        }
+        else if(cpuMove[0] == 2 && cpuMove[1] == 2){
+            return 'C3'
+        }
+
+
+    }
+
+
+
+
+
+    $('.square').click(function(){
+
+        if(playerTurn  && this.id.length === 2  && movesRemaining(board)){
+            selectedMove = mapToBoard(this.id);
+            console.log(selectedMove);
+            $(this).html(player_token);
+            board[selectedMove[0]][selectedMove[1]] = player_token;
+            playerTurn = false;
+
+            if(movesRemaining(board)){
+                cpuMove = determineMove(board, player_token, cpu_token, maximizer);
+                board[cpuMove[0]][cpuMove[1]] = cpu_token;
+                $('#' + maptToHTML(cpuMove)).html(cpu_token);
+                playerTurn = true;
+            }
+
+
+        }
+
+
     });
-}
 
-// - Create a marksquare function
-function markSquare(currentSquare){
-    console.log(currentSquare.id);
-    var squareResult = ""
-    // console.log(currentSquare.innerHTML)
-    if((currentSquare.innerHTML == "X") || (currentSquare.innerHTML == "O")){
-        // console.log("This square is taken")
-        squareResult = "Sorry, this square is taken."
-    }else if(gameOverBool){
-        squareResult = "Someone has won the game!"
-    }else if(whosTurn == 1){
-        currentSquare.innerHTML = "X"
-        whosTurn = 2;
-        player1Squares.push(currentSquare.id)
-        checkWin(player1Squares,1);
-        if(onePlayerGame && !gameOverBool){
-            computerMove();
-        }
-    }else{
-        currentSquare.innerHTML = "O"
-        whosTurn = 1;
-        player2Squares.push(currentSquare.id)
-        checkWin(player2Squares,2);
-    }
+    $('#restart-button').click(function(){
 
-    // console.log(player1Squares);
-    // console.log(player2Squares);
-    var messageElement = document.getElementById('message');
-    messageElement.innerHTML = squareResult;
-}
+        if(gameOver){
 
+            board = [[null, null, null], [null, null, null], [null, null, null]];
+            $('.square').each(function(){
+                $(this).html(this.id);
+            });
 
-
-function checkWin(currentPlayersSquares, whoJustWent){
-    // Outter Loop (winning combos)
-    for(let i = 0; i < winningCombos.length; i++){
-        // Inner Loop (Square inside a winning Combo)
-        var squareCount = 0;
-        for(let j = 0; j < winningCombos[i].length; j++){
-            var winningSquare = winningCombos[i][j];
-            // Does the player have this square?
-            if(currentPlayersSquares.indexOf(winningSquare) > -1){
-                // The index is > -1, which means the player has this square.
-                // We don't care when it happend, we just care that it happend
-                squareCount++;
+            if(player_token == 'X'){
+                player_token = 'O';
+                cpu_token = 'X'
+                cpuMove = determineMove(board, player_token, cpu_token, maximizer);
+                board[cpuMove[0]][cpuMove[1]] = cpu_token;
+                $('#' + maptToHTML(cpuMove)).html(cpu_token);
+                playerTurn = true;
             }
+            else{
+                player_token = 'X';
+                cpu_token = 'O';
+                playerTurn = true;
+            }
+            gameOver = false;
         }
-        // if squareCount is 3, then the user had all 3 j's in this i. Winning.
-        if(squareCount == 3){
-            console.log("Player " + whoJustWent + " won the game!");
-            // Stop checking i's, the game is over...
-            gameOver(whoJustWent,winningCombos[i]);
-            break;
-        }
-    }
-}
 
-function gameOver(whoJustWon,winningCombo){
-    var messageElement = document.getElementById('message');
-    var message = "Congratulations to player " + whoJustWon + ". You won with " + winningCombo;
-    // console.log(message);
-    // console.dir(messageElement)
-    messageElement.innerHTML = message;
-    // console.dir(messageElement)
-    for(let i = 0; i<winningCombo.length;i++){
-        document.getElementById(winningCombo[i]).className += ' winning-square';
-    }
-    gameOverBool = true;
-}
 
-function restart(){
-    if(gameOverBool === true) {
-        whosTurn = 1;
-        gameOverBool = false;
-        player1Squares = [];
-        player2Squares = [];
-        for (let i = 0; i < squares.length; i++) {
-            // console.log(squares[i]);
-            //console.log(squares[i])
-            squares[i].innerHTML = squares[i].id;
-            squares[i].className = squares[i].className.slice(0, 6)
-            console.log(squares[i].className);
-        }
-    }
-}
 
-function computerMove(){
-    var validSelection = false;
-    while(!validSelection){
-        var selection = Math.floor(Math.random()*squares.length);
-        if(squares[selection].innerHTML.length > 1){
-            validSelection = true;
-            markSquare(squares[selection]);
-        }
-    }
-}
+    })
+
+
+
+});
